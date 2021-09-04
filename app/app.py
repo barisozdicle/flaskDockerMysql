@@ -1,13 +1,29 @@
 from flask import Flask, jsonify
+import mysql.connector
 
 app = Flask(__name__)
+app.config['SECRET_KEY'] = "baris"
 
 
 @app.route("/")
 def index():
-    articles = [{"id": 1, "name": "baris"}, {"id": 2, "name": "gizem"}]
+    db = mysql.connector.connect(user='baris', password='1',
+                                 host='mysql', port=3306, database='SuadiyeDB')
 
-    return jsonify(articles)
+    cursor = db.cursor()
+    query = "Select * from Furniture"
+    cursor.execute(query)
+
+    liste = {}
+
+    for i in cursor:
+        liste['FurnitureName'] = i[1]
+        liste['FurnitureImage'] = i[2]
+
+    cursor.close()
+    db.close()
+
+    return liste
 
 
 if __name__ == "__main__":
