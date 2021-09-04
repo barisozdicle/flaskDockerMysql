@@ -1,0 +1,24 @@
+version: "3"
+
+services:
+  app:
+    container_name: app
+    image: "python:latest"
+    ports:
+      - 5000:5000
+    depends_on:
+      - mysql
+
+  mysql:
+    platform: linux/x86_64
+    container_name: mysql
+    image: "mysql:latest"
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: 123
+      MYSQL_USER: baris
+      MYSQL_PASSWORD: 1
+      MYSQL_DATABASE: SuadiyeDB
+      LANG: C-UTF-8
+
