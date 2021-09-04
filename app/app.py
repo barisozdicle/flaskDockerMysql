@@ -1,16 +1,21 @@
-from flask import Flask, jsonify
-import mysql.connector
+from flask import Flask
+from flaskext.mysql import MySQL
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = "baris"
+app.config['SECRET_KEY'] = "secret_key"
+app.config['MYSQL_DATABASE_HOST'] = 'mysql'
+app.config['MYSQL_DATABASE_USER'] = 'baris'
+app.config['MYSQL_DATABASE_PASSWORD'] = '1'
+app.config['MYSQL_DATABASE_DB'] = 'SuadiyeDB'
+app.config['MYSQL_DATABASE_PORT'] = 3306
+
+db = MySQL()
+db.init_app(app)
 
 
 @app.route("/")
 def index():
-    db = mysql.connector.connect(user='baris', password='1',
-                                 host='mysql', port=3306, database='SuadiyeDB')
-
-    cursor = db.cursor()
+    cursor = db.get_db().cursor()
     query = "Select * from Furniture"
     cursor.execute(query)
 
@@ -21,7 +26,6 @@ def index():
         liste['FurnitureImage'] = i[2]
 
     cursor.close()
-    db.close()
 
     return liste
 

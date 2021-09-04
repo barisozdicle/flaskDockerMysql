@@ -1,3 +1,2 @@
 Flask
-jsonify
-mysql-connector-python
+MySQL
