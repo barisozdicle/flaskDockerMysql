@@ -5,20 +5,42 @@ services:
     container_name: app
     image: "python:latest"
     ports:
-      - 5000:5000
+      - "${FLASK_PORT}:${CONTAINER_FLASK_PORT}"
+    volumes:
+      - ./app:/app
+    working_dir: /app
+    command: bash -c "pip install -r requirements.txt && python app.py"
+    environment:
+      - FLASK_APP=${FLASK_APP}
+      - FLASK_ENV=${FLASK_ENV}
+      - FLASK_DEBUG=${FLASK_DEBUG}
+      - MYSQL_HOST=${MYSQL_HOST}
+      - MYSQL_PORT=${MYSQL_PORT}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - APP_SECRET_KEY=${APP_SECRET_KEY}
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
 
   mysql:
     platform: linux/x86_64
     container_name: mysql
     image: "mysql:latest"
     ports:
-      - 3306:3306
+      - "${MYSQL_PORT}:${MYSQL_PORT}"
+    volumes:
+      - ./db/mysql:/docker-entrypoint-initdb.d
     environment:
-      MYSQL_ROOT_PASSWORD: 123
-      MYSQL_USER: baris
-      MYSQL_PASSWORD: 1
-      MYSQL_DATABASE: SuadiyeDB
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
       LANG: C-UTF-8
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "--password=${MYSQL_ROOT_PASSWORD}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
